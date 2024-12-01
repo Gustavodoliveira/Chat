@@ -1,4 +1,4 @@
-package com.example.gustavo.chat.Dtos;
+package com.example.gustavo.chat.Dtos.users;
 
 import com.example.gustavo.chat.models.Roles;
 
