@@ -39,6 +39,14 @@ public class User implements UserDetails {
     this.role = user.role();
   }
 
+  public User(User data, String encryptedPassword) {
+    this.email = data.email;
+    this.userName = data.userName;
+    this.age = data.age;
+    this.role = data.role;
+    this.password = encryptedPassword;
+  }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     if (this.role == Roles.ADMIN)

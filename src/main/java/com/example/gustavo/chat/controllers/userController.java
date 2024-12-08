@@ -5,13 +5,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.gustavo.chat.Dtos.users.ResponseRegisterUserDto;
+import com.example.gustavo.chat.Dtos.users.updateUserDto;
 import com.example.gustavo.chat.Dtos.users.userDto;
 import com.example.gustavo.chat.Service.TokenService;
 import com.example.gustavo.chat.Service.userService;
@@ -36,6 +39,27 @@ public class userController {
       String token = tokenService.generateToken(newUser);
       ResponseRegisterUserDto responseRegisterUserDto = new ResponseRegisterUserDto("success register", token);
       return ResponseEntity.ok().body(responseRegisterUserDto);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @DeleteMapping
+  public ResponseEntity deleteUser() {
+    try {
+      String resp = userService.deleteUser();
+      return ResponseEntity.ok().body(resp);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+  }
+
+  @PatchMapping
+  public ResponseEntity updateUser(@RequestBody updateUserDto data) {
+    try {
+      String resp = userService.updateUser(data);
+      return ResponseEntity.ok().body(resp);
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     }

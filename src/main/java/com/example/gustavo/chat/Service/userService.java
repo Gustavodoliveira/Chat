@@ -4,19 +4,74 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.gustavo.chat.Dtos.users.updateUserDto;
 import com.example.gustavo.chat.Exception.EmailExistException;
 import com.example.gustavo.chat.Exception.FieldNullException;
+import com.example.gustavo.chat.infra.FilterSecurity;
 import com.example.gustavo.chat.models.User;
 import com.example.gustavo.chat.repository.userRepository;
 import com.mongodb.MongoException;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Service
 public class userService {
+  @Autowired
+  TokenService tokenService;
+
+  @Autowired
+  FilterSecurity filterSecurity;
+
+  @Autowired
+  HttpServletRequest req;
 
   @Autowired
   private userRepository userRepository;
+
+  public String updateUser(updateUserDto data) throws Exception {
+    User user = this.findUserByToken();
+    User userUpdate = new User();
+
+    userUpdate.setRole(user.getRole());
+
+    if (data.email() == null)
+      userUpdate.setEmail(user.getEmail());
+    else
+      userUpdate.setEmail(data.email());
+
+    if (data.userName() == null)
+      userUpdate.setUserName(user.getUsername());
+    else
+      userUpdate.setUserName(data.userName());
+
+    if (data.password() == null)
+      userUpdate.setPassword(user.getPassword());
+    else
+      userUpdate.setPassword(data.password());
+
+    try {
+      MongoOperations mongoOperations;
+      mongoOperations.updateFirst(query(where(email).is()))
+      return "update success";
+    } catch (Exception e) {
+      throw new Exception(e.getMessage());
+    }
+
+  }
+
+  public String deleteUser() {
+    User user = this.findUserByToken();
+    try {
+      userRepository.deleteById(user.getId());
+      return "User delete success";
+    } catch (Exception e) {
+      throw new MongoException(e.getMessage());
+    }
+  }
 
   public List<User> findAllUsers() {
     try {
@@ -24,7 +79,6 @@ public class userService {
     } catch (Exception e) {
       throw new MongoException(e.getMessage());
     }
-
   }
 
   public User findUser(User user) {
@@ -35,7 +89,10 @@ public class userService {
     User usr = this.findUser(user);
     if (usr != null)
       throw new EmailExistException("Email exist");
-    return userRepository.save(user);
+
+    String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+    User newUsrEncryptedPassword = new User(user, encryptedPassword);
+    return userRepository.save(newUsrEncryptedPassword);
   }
 
   public boolean verifyUserFields(User newUser) {
@@ -52,6 +109,18 @@ public class userService {
       throw new FieldNullException("password is null");
 
     return true;
+
+  }
+
+  public User findUserByToken() {
+    try {
+      String token = this.filterSecurity.recoverToken(req);
+      String email = tokenService.validateToken(token);
+      User user = userRepository.findByEmail(email);
+      return user;
+    } catch (Exception e) {
+      throw new MongoException(e.getMessage());
+    }
 
   }
 }
