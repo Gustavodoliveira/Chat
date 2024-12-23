@@ -42,6 +42,11 @@ public class userService {
     else
       userUpdate.setEmail(data.email());
 
+    if (data.age() == null)
+      userUpdate.setAge(user.getAge());
+    else
+      userUpdate.setAge(data.age());
+
     if (data.userName() == null)
       userUpdate.setUserName(user.getUsername());
     else
@@ -53,6 +58,8 @@ public class userService {
       userUpdate.setPassword(data.password());
 
     try {
+      userRepository.updateUser(userUpdate.getEmail(), userUpdate.getUsername(), userUpdate.getPassword(),
+          userUpdate.getAge(), user.getEmail());
       return "update success";
     } catch (Exception e) {
       throw new Exception(e.getMessage());

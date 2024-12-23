@@ -37,10 +37,10 @@ public class User implements UserDetails {
   @Column(length = 60, nullable = false, unique = true)
   private String userName;
 
-  @Column(length = 60, nullable = false, unique = true)
+  @Column(length = 60, nullable = false)
   private Integer age;
 
-  @Column(length = 60, nullable = false, unique = true)
+  @Column(length = 60, nullable = false)
   private String password;
 
   @Column()
