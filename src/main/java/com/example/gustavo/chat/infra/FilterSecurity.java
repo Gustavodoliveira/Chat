@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.gustavo.chat.Service.TokenService;
-import com.example.gustavo.chat.repository.userRepository;
+import com.example.gustavo.chat.repository.UserRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,8 +21,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FilterSecurity extends OncePerRequestFilter {
   @Autowired
   TokenService tokenService;
+
   @Autowired
-  userRepository userRepository;
+  UserRepository userRepository;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

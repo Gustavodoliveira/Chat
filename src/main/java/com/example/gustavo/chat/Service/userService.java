@@ -1,10 +1,9 @@
 package com.example.gustavo.chat.Service;
 
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +12,13 @@ import com.example.gustavo.chat.Exception.EmailExistException;
 import com.example.gustavo.chat.Exception.FieldNullException;
 import com.example.gustavo.chat.infra.FilterSecurity;
 import com.example.gustavo.chat.models.User;
-import com.example.gustavo.chat.repository.userRepository;
-import com.mongodb.MongoException;
+import com.example.gustavo.chat.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class userService {
+
   @Autowired
   TokenService tokenService;
 
@@ -30,7 +29,7 @@ public class userService {
   HttpServletRequest req;
 
   @Autowired
-  private userRepository userRepository;
+  private UserRepository userRepository;
 
   public String updateUser(updateUserDto data) throws Exception {
     User user = this.findUserByToken();
@@ -54,8 +53,6 @@ public class userService {
       userUpdate.setPassword(data.password());
 
     try {
-      MongoOperations mongoOperations;
-      mongoOperations.updateFirst(query(where(email).is()))
       return "update success";
     } catch (Exception e) {
       throw new Exception(e.getMessage());
@@ -63,21 +60,21 @@ public class userService {
 
   }
 
-  public String deleteUser() {
+  public String deleteUser() throws SQLException {
     User user = this.findUserByToken();
     try {
       userRepository.deleteById(user.getId());
       return "User delete success";
     } catch (Exception e) {
-      throw new MongoException(e.getMessage());
+      throw new SQLException(e.getMessage());
     }
   }
 
-  public List<User> findAllUsers() {
+  public List<User> findAllUsers() throws SQLException {
     try {
       return userRepository.findAll();
     } catch (Exception e) {
-      throw new MongoException(e.getMessage());
+      throw new SQLException(e.getMessage());
     }
   }
 
@@ -112,14 +109,14 @@ public class userService {
 
   }
 
-  public User findUserByToken() {
+  public User findUserByToken() throws SQLException {
     try {
       String token = this.filterSecurity.recoverToken(req);
       String email = tokenService.validateToken(token);
       User user = userRepository.findByEmail(email);
       return user;
     } catch (Exception e) {
-      throw new MongoException(e.getMessage());
+      throw new SQLException(e.getMessage());
     }
 
   }

@@ -3,32 +3,47 @@ package com.example.gustavo.chat.models;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.gustavo.chat.Dtos.users.userDto;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Document(collection = "user")
 @NoArgsConstructor
 @Getter
 @Setter
 @AllArgsConstructor
+@Entity
 public class User implements UserDetails {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
+
+  @Column(length = 60, nullable = false, unique = true)
   private String email;
+
+  @Column(length = 60, nullable = false, unique = true)
   private String userName;
+
+  @Column(length = 60, nullable = false, unique = true)
   private Integer age;
+
+  @Column(length = 60, nullable = false, unique = true)
   private String password;
+
+  @Column()
   private Roles role;
 
   public User(userDto user) {
